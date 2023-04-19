@@ -8,7 +8,7 @@ require 'awesome_print'
 module ALU
   # Cast an integer number to double word
   def integer_to_double_word(number)
-    raise 'number should be in interval -(2^64) ~ (2^64)-1' unless DoubleWord.representable_integer?(number)
+    raise 'number should be in interval -(2^63) ~ (2^63)-1' unless DoubleWord.representable_integer?(number)
 
     negative_number = number.negative?
     number = -number if negative_number
@@ -58,11 +58,11 @@ module ALU
   end
 
   # Binary sum
-  def binary_sum(dword_a, dword_b, allow_overflow: false)
+  def binary_sum(dword_a, dword_b, detect_overflow: true)
     str_result = String.new('')
     carry = '0'
     64.times do |round|
-      raise 'overflow deetected' if !allow_overflow && carry == '1' && round == 63
+      raise 'overflow deetected' if detect_overflow && carry == '1' && round == 63
 
       i = 63 - round
 
@@ -104,7 +104,7 @@ module ALU
   def negate_double_word(dword)
     new_bits = dword.bits.split('').map { |bit| bit_negate(bit) }.join
 
-    binary_sum(DoubleWord.new(new_bits), integer_to_double_word(1), allow_overflow: true)
+    binary_sum(DoubleWord.new(new_bits), integer_to_double_word(1), detect_overflow: false)
   end
 
   # and operation
